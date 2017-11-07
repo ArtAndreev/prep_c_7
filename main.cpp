@@ -2,25 +2,37 @@
 
 #include "List.h"
 
+enum {
+    SUCCESS = 0,
+    RANGE_ERROR,
+    INVALID_ARGUMENT,
+    BAD_ALLOC,
+    IOS_BASE_FAILURE,
+};
+
 int main() {
     List<int> empty;
+    int error_code = SUCCESS;
     try {
         empty.pop_back(); // same as pop_front()
     }
     catch (const std::range_error& e) {
         std::cerr << e.what() << std::endl;
+        error_code = RANGE_ERROR;
     }
     try {
-        std::cout << empty[-1]; // same as indexes > 0
+        std::cout << empty[1]; // indexes > 0
     }
     catch (const std::invalid_argument& e) {
         std::cerr << e.what() << std::endl;
+        error_code = INVALID_ARGUMENT;
     }
     try {
         std::cout << empty.pop(); // same as front()
     }
     catch (const std::range_error& e) {
         std::cerr << e.what() << std::endl;
+        error_code = RANGE_ERROR;
     }
 
     try {
@@ -47,16 +59,20 @@ int main() {
     }
     catch (const std::bad_alloc& e) {
         std::cerr << e.what() << std::endl;
+        error_code = BAD_ALLOC;
     }
     catch (const std::range_error& e) {
         std::cerr << e.what() << std::endl;
+        error_code = RANGE_ERROR;
     }
     catch (const std::invalid_argument& e) {
         std::cerr << e.what() << std::endl;
+        error_code = INVALID_ARGUMENT;
     }
     catch (const std::ios_base::failure& e) {
         std::cerr << e.what() << std::endl;
+        error_code = IOS_BASE_FAILURE;
     }
-    
-    return 0;
+
+    return error_code;
 }
