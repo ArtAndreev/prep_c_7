@@ -3,7 +3,20 @@
 
 #include <exception>
 
-#include "Node.h"
+template <class T>
+struct Node {
+    explicit Node(T elem);
+    Node<T>* next;
+    Node<T>* prev;
+    T data;
+};
+
+template <class T>
+Node<T>::Node(T elem): next(nullptr),
+                       prev(nullptr),
+                       data(elem) {
+
+}
 
 template <class T>
 class List {
@@ -22,11 +35,14 @@ public:
     size_t size() const;
     bool empty() const;
 
-    T pop() const;
-    T front() const;
+    T& pop() const;
+    T& pop();
+    T& front() const;
+    T& front();
 
     List<T>& operator=(const List<T>& rhs);
-    T operator[](size_t index) const;
+    T& operator[](size_t index) const;
+    T& operator[](size_t index);
     List<T> operator+(const List<T>& rhs) const;
     template <class U>
     friend std::ostream& operator<<(std::ostream& os, const List<U>& rhs);
@@ -55,11 +71,10 @@ List<T>::List(std::initializer_list<T> list): head(nullptr),
 template <class T>
 List<T>::List(const List& obj) {
     Node<T>* temp = obj.head;
-    while (temp->next != nullptr) {
+    while (temp != nullptr) {
         push_back(temp->data);
         temp = temp->next;
     }
-    push_back(temp->data);
     list_size = obj.list_size;
 }
 
@@ -144,7 +159,7 @@ void List<T>::clear() {
         return;
 
     Node<T>* temp = head;
-    while (temp->next != nullptr) {
+    while (temp != nullptr) {
         delete temp->prev;
         temp = temp->next;
     }
@@ -165,7 +180,7 @@ bool List<T>::empty() const {
 }
 
 template <class T>
-T List<T>::pop() const {
+T& List<T>::pop() const {
     if (tail == nullptr)
         throw std::range_error("List is empty.");
 
@@ -173,7 +188,23 @@ T List<T>::pop() const {
 }
 
 template <class T>
-T List<T>::front() const {
+T& List<T>::pop() {
+    if (tail == nullptr)
+        throw std::range_error("List is empty.");
+
+    return tail->data;
+}
+
+template <class T>
+T& List<T>::front() const {
+    if (head == nullptr)
+        throw std::range_error("List is empty.");
+
+    return head->data;
+}
+
+template <class T>
+T& List<T>::front() {
     if (head == nullptr)
         throw std::range_error("List is empty.");
 
@@ -187,18 +218,34 @@ List<T>& List<T>::operator=(const List<T>& rhs) {
 
     clear();
     Node<T>* temp = rhs.head;
-    while (temp->next != nullptr) {
+    while (temp != nullptr) {
         push_back(temp->data);
         temp = temp->next;
     }
-    push_back(temp->data);
 
     return *this;
 }
 
 template <class T>
-T List<T>::operator[](size_t index) const {
-    if (index < 0 || index >= list_size)
+T& List<T>::operator[](size_t index) const {
+    if (index >= list_size)
+        throw std::invalid_argument("Wrong index given.");
+
+    if (index == 0)
+        return front();
+    if (index == list_size - 1)
+        return pop();
+
+    Node<T>* temp = head;
+    for (size_t i = 0; i < index; i++)
+        temp = temp->next;
+
+    return temp->data;
+}
+
+template <class T>
+T& List<T>::operator[](size_t index) {
+    if (index >= list_size)
         throw std::invalid_argument("Wrong index given.");
 
     if (index == 0)
@@ -215,20 +262,13 @@ T List<T>::operator[](size_t index) const {
 
 template <class T>
 List<T> List<T>::operator+(const List<T>& rhs) const {
-    List<T> temp_list;
-    Node<T>* temp_node = head;
-    while (temp_node->next != nullptr) {
-        temp_list.push_back(temp_node->data);
-        temp_node = temp_node->next;
-    }
-    temp_list.push_back(temp_node->data);
+    List<T> temp_list(*this);
 
-    temp_node = rhs.head;
-    while (temp_node->next != nullptr) {
+    Node<T>* temp_node = rhs.head;
+    while (temp_node != nullptr) {
         temp_list.push_back(temp_node->data);
         temp_node = temp_node->next;
     }
-    temp_list.push_back(temp_node->data);
 
     return temp_list;
 }
