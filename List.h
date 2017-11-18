@@ -35,13 +35,13 @@ public:
     size_t size() const;
     bool empty() const;
 
-    T& pop() const;
+    const T& pop() const;
     T& pop();
-    T& front() const;
+    const T& front() const;
     T& front();
 
     List<T>& operator=(const List<T>& rhs);
-    T& operator[](size_t index) const;
+    const T& operator[](size_t index) const;
     T& operator[](size_t index);
     List<T> operator+(const List<T>& rhs) const;
     template <class U>
@@ -180,7 +180,7 @@ bool List<T>::empty() const {
 }
 
 template <class T>
-T& List<T>::pop() const {
+const T& List<T>::pop() const {
     if (tail == nullptr)
         throw std::range_error("List is empty.");
 
@@ -196,7 +196,7 @@ T& List<T>::pop() {
 }
 
 template <class T>
-T& List<T>::front() const {
+const T& List<T>::front() const {
     if (head == nullptr)
         throw std::range_error("List is empty.");
 
@@ -227,7 +227,7 @@ List<T>& List<T>::operator=(const List<T>& rhs) {
 }
 
 template <class T>
-T& List<T>::operator[](size_t index) const {
+const T& List<T>::operator[](size_t index) const {
     if (index >= list_size)
         throw std::invalid_argument("Wrong index given.");
 
